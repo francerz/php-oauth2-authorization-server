@@ -37,6 +37,12 @@ class AuthorizeServer
     }
 
     #region Callable handlers
+    /**
+     * Undocumented function
+     *
+     * @param callable $handler Signature (string $client_id) : ?ClientInterface
+     * @return void
+     */
     public function setFindClientHandler(callable $handler)
     {
         if (!Functions::testSignature($handler, ['string'], ClientInterface::class)) {
@@ -48,6 +54,12 @@ class AuthorizeServer
         $this->findClientHandler = $handler;
     }
 
+    /**
+     * Undocumented function
+     *
+     * @param callable $handler Signature () : ?ResourceOwnerInterface
+     * @return void
+     */
     public function setGetResourceOwnerHandler(callable $handler)
     {
         if (!Functions::testSignature($handler, [], ResourceOwnerInterface::class)) {
@@ -59,6 +71,12 @@ class AuthorizeServer
         $this->getResourceOwnerHandler = $handler;
     }
 
+    /**
+     * Undocumented function
+     *
+     * @param callable $handler Signature (ClientInterface $client, ResourceOwnerInterface $owner, string $scope, UriInterface $redirect_uri) : string
+     * @return void
+     */
     public function setCreateAuthorizationCodeHandler(callable $handler)
     {
         if (!Functions::testSignature(

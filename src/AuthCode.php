@@ -18,9 +18,9 @@ class AuthCode implements AuthCodeInterface
     private $params = array();
 
     public function __construct(
+        string $code,
         string $clientId,
         string $ownerId,
-        string $code,
         string $scope,
         UriInterface $redirectUri,
         int $lifetime = 600,
@@ -97,6 +97,11 @@ class AuthCode implements AuthCodeInterface
         return $this->lifetime;
     }
 
+    public function getCreateTime() : int
+    {
+        return $this->createTime;
+    }
+
     public function withRedeemTime(int $epoch): AuthCode
     {
         $new = clone $this;
@@ -104,7 +109,7 @@ class AuthCode implements AuthCodeInterface
         return $new;
     }
 
-    public function getRedeemTime(): int
+    public function getRedeemTime(): ?int
     {
         return $this->redeemTime;
     }

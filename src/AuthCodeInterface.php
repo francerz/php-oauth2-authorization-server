@@ -21,8 +21,10 @@ interface AuthCodeInterface
     public function withLifetime(int $lifetime) : AuthCodeInterface;
     public function getLifetime() : int;
 
+    public function getCreateTime() : int;
+
     public function withRedeemTime(int $epoch) : AuthCodeInterface;
-    public function getRedeemTime() : int;
+    public function getRedeemTime() : ?int;
 
     public function withRedirectUri(UriInterface $uri) : AuthCodeInterface;
     public function getRedirectUri() : UriInterface;

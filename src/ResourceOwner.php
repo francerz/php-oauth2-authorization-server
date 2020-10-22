@@ -10,7 +10,7 @@ class ResourceOwner implements ResourceOwnerInterface
         $this->uniqueId = $uniqueId;
     }
 
-    public function getUniqueId(): string
+    public function getOwnerId(): string
     {
         return $this->uniqueId;
     }

@@ -42,6 +42,12 @@ class TokenServer
     }
 
     #region Callable Handlers
+    /**
+     * Undocumented function
+     *
+     * @param callable $handler Signature (ClientInterface $client, ResourceOwnerInterface $owner, string $scope) : AccessToken
+     * @return void
+     */
     public function setCreateAccessTokenHandler(callable $handler)
     {
         if (!Functions::testSignature(
@@ -51,11 +57,18 @@ class TokenServer
         ) {
             throw new InvalidArgumentException(
                 'Handler createAccesToken signature MUST be: '.
-                '(ClientInterface $client, ResourceOwnerInterface $owner, string $scope)'
+                '(ClientInterface $client, ResourceOwnerInterface $owner, string $scope) : AccessToken'
             );
         }
         $this->createAccessTokenHandler = $handler;
     }
+
+    /**
+     * Undocumented function
+     *
+     * @param callable $handler Signature (string $code) : AuthCodeInterface
+     * @return void
+     */
     public function setFindAuthorizationCodeHandler(callable $handler)
     {
         if (!Functions::testSignature($handler, ['string'], AuthCodeInterface::class)) {
@@ -66,6 +79,13 @@ class TokenServer
         }
         $this->findAuthorizationCodeHandler = $handler;
     }
+
+    /**
+     * Undocumented function
+     *
+     * @param callable $handler Signature (string $client_id) : ClientInterface
+     * @return void
+     */
     public function setFindClientHandler(callable $handler)
     {
         if (!Functions::testSignature($handler, ['string'], ClientInterface::class)) {
@@ -76,6 +96,13 @@ class TokenServer
         }
         $this->findClientHandler = $handler;
     }
+
+    /**
+     * Undocumented function
+     *
+     * @param callable $handler Signature (string $refreshToken) : RefreshTokenInterface
+     * @return void
+     */
     public function setFindRefreshTokenHandler(callable $handler)
     {
         if (!Functions::testSignature($handler, ['string'], RefreshTokenInterface::class)) {
@@ -86,6 +113,13 @@ class TokenServer
         }
         $this->findRefreshTokenHandler = $handler;
     }
+
+    /**
+     * Undocumented function
+     *
+     * @param callable $handler Signature (string $ownerId) : ResourceOwnerInterface
+     * @return void
+     */
     public function setFindResourceOwnerHandler(callable $handler)
     {
         if (!Functions::testSignature($handler, ['string'], ResourceOwnerInterface::class)) {
@@ -96,6 +130,13 @@ class TokenServer
         }
         $this->findResourceOwnerHandler = $handler;
     }
+
+    /**
+     * Undocumented function
+     *
+     * @param callable $handler Signature (AuthCodeInterface $authCode) : void
+     * @return void
+     */
     public function setUpdateAuthorizationCodeRedeemTimeHandler(callable $handler)
     {
         if (!Functions::testSignature($handler, [AuthCodeInterface::class])) {
