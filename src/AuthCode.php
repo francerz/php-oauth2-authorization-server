@@ -21,16 +21,16 @@ class AuthCode implements AuthCodeInterface
         string $code,
         string $clientId,
         string $ownerId,
-        string $scope,
-        UriInterface $redirectUri,
+        ?string $scope,
+        ?UriInterface $redirectUri = null,
         int $lifetime = 600,
-        int $createTime = null,
-        int $redeemTime = null
+        ?int $createTime = null,
+        ?int $redeemTime = null
     ) {
         $this->clientId = $clientId;
         $this->ownerId = $ownerId;
         $this->code = $code;
-        $this->scope = $scope;
+        $this->scope = isset($scope) ? $scope : '';
         $this->redirectUri = $redirectUri;
         $this->lifetime = $lifetime;
         $this->createTime = isset($createTime) ? $createTime : time();
@@ -121,7 +121,7 @@ class AuthCode implements AuthCodeInterface
         return $new;
     }
 
-    public function getRedirectUri(): UriInterface
+    public function getRedirectUri(): ?UriInterface
     {
         return $this->redirectUri;
     }

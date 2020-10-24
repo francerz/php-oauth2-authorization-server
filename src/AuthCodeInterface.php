@@ -27,7 +27,7 @@ interface AuthCodeInterface
     public function getRedeemTime() : ?int;
 
     public function withRedirectUri(UriInterface $uri) : AuthCodeInterface;
-    public function getRedirectUri() : UriInterface;
+    public function getRedirectUri() : ?UriInterface;
 
     public function getExpireTime() : int;
     public function isUsed() : bool;
