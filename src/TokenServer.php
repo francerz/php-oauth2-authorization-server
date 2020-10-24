@@ -333,6 +333,7 @@ class TokenServer
         $response = $responseFactory->createResponse(StatusCodes::SUCCESS_OK)
             ->withHeader('Cache-Control', 'no-store')
             ->withHeader('Pragma', 'no-cache');
+        MessageHelper::setHttpFactoryManager($this->httpFactory);
         $response = MessageHelper::withContent(
             $response,
             MediaTypes::APPLICATION_JSON,
