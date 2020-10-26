@@ -2,11 +2,11 @@
 
 namespace Francerz\OAuth2\AuthServer;
 
-use Francerz\Http\Constants\MediaTypes;
-use Francerz\Http\Constants\StatusCodes;
-use Francerz\Http\Headers\BasicAuthorizationHeader;
-use Francerz\Http\Tools\HttpFactoryManager;
-use Francerz\Http\Tools\MessageHelper;
+use Francerz\Http\Utils\Constants\MediaTypes;
+use Francerz\Http\Utils\Constants\StatusCodes;
+use Francerz\Http\Utils\Headers\BasicAuthorizationHeader;
+use Francerz\Http\Utils\HttpFactoryManager;
+use Francerz\Http\Utils\MessageHelper;
 use Francerz\OAuth2\AccessToken;
 use Francerz\OAuth2\AuthServer\AuthCodeInterface;
 use Francerz\OAuth2\AuthServer\ClientInterface;

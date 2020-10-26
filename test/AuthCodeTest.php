@@ -1,7 +1,7 @@
 <?php
 
 use Francerz\Http\HttpFactory;
-use Francerz\Http\Tools\HttpFactoryManager;
+use Francerz\Http\Utils\HttpFactoryManager;
 use Francerz\OAuth2\AuthServer\AuthCode;
 use PHPUnit\Framework\TestCase;
 

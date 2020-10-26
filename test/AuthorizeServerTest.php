@@ -1,10 +1,10 @@
 <?php
 
-use Francerz\Http\Constants\Methods;
-use Francerz\Http\Constants\StatusCodes;
 use Francerz\Http\HttpFactory;
-use Francerz\Http\Tools\HttpFactoryManager;
-use Francerz\Http\Tools\UriHelper;
+use Francerz\Http\Utils\Constants\Methods;
+use Francerz\Http\Utils\Constants\StatusCodes;
+use Francerz\Http\Utils\HttpFactoryManager;
+use Francerz\Http\Utils\UriHelper;
 use Francerz\OAuth2\AuthorizeRequestTypes;
 use Francerz\OAuth2\AuthServer\AuthorizeServer;
 use Francerz\OAuth2\AuthServer\Client;

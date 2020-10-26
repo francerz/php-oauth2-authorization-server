@@ -2,9 +2,9 @@
 
 namespace Francerz\OAuth2\AuthServer;
 
-use Francerz\Http\Constants\StatusCodes;
-use Francerz\Http\Tools\HttpFactoryManager;
-use Francerz\Http\Tools\UriHelper;
+use Francerz\Http\Utils\Constants\StatusCodes;
+use Francerz\Http\Utils\HttpFactoryManager;
+use Francerz\Http\Utils\UriHelper;
 use Francerz\OAuth2\AuthError;
 use Francerz\OAuth2\AuthErrorCodes;
 use Francerz\OAuth2\AuthorizeRequestTypes;
