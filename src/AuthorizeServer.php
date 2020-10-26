@@ -9,6 +9,7 @@ use Francerz\OAuth2\AuthError;
 use Francerz\OAuth2\AuthErrorCodes;
 use Francerz\OAuth2\AuthorizeRequestTypes;
 use Francerz\OAuth2\AuthServer\ClientInterface;
+use Francerz\OAuth2\AuthServer\Exceptions\NullResourceOwnerException;
 use Francerz\OAuth2\AuthServer\ResourceOwnerInterface;
 use Francerz\PowerData\Functions;
 use InvalidArgumentException;
@@ -148,7 +149,7 @@ class AuthorizeServer
         }
         $resourceOwner = $getResourceOwnerHandler();
         if (!isset($resourceOwner)) {
-            throw new RuntimeException();
+            throw new NullResourceOwnerException();
         }
 
         $code = $createAuthorizationCodeHandler(
