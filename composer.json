@@ -1,5 +1,5 @@
 {
-    "name": "francerz/php-oauth2-authorization-server",
+    "name": "francerz/oauth2-authorization-server",
     "description": "Authorization Server library for OAuth 2.0 Authorization Framework",
     "keywords": ["oauth2", "psr-7"],
     "license": "MIT",
