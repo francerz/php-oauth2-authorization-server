@@ -30,7 +30,7 @@ class Client implements ClientInterface
         return $this->confidential;
     }
 
-    public function withParam(string $name, $value) : Client
+    public function withParam(string $name, $value) : ClientInterface
     {
         $new = clone $this;
         $new->params[$name] = $value;
