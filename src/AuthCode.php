@@ -37,7 +37,7 @@ class AuthCode implements AuthCodeInterface
         $this->redeemTime = $redeemTime;
     }
 
-    public function withClientId(string $client_id): AuthCode
+    public function withClientId(string $client_id): AuthCodeInterface
     {
         $new = clone $this;
         $new->clientId = $client_id;
@@ -49,7 +49,7 @@ class AuthCode implements AuthCodeInterface
         return $this->clientId;
     }
 
-    public function withOwnerId(string $owner_id): AuthCode
+    public function withOwnerId(string $owner_id): AuthCodeInterface
     {
         $new = clone $this;
         $new->ownerId = $owner_id;
@@ -61,7 +61,7 @@ class AuthCode implements AuthCodeInterface
         return $this->ownerId;
     }
 
-    public function withCode(string $code): AuthCode
+    public function withCode(string $code): AuthCodeInterface
     {
         $new = clone $this;
         $new->code = $code;
@@ -73,7 +73,7 @@ class AuthCode implements AuthCodeInterface
         return $this->code;
     }
 
-    public function withScope(string $scope): AuthCode
+    public function withScope(string $scope): AuthCodeInterface
     {
         $new = clone $this;
         $new->scope = $scope;
@@ -85,7 +85,7 @@ class AuthCode implements AuthCodeInterface
         return $this->scope;
     }
 
-    public function withLifetime(int $lifetime): AuthCode
+    public function withLifetime(int $lifetime): AuthCodeInterface
     {
         $new = clone $this;
         $new->lifetime = $lifetime;
@@ -102,7 +102,7 @@ class AuthCode implements AuthCodeInterface
         return $this->createTime;
     }
 
-    public function withRedeemTime(int $epoch): AuthCode
+    public function withRedeemTime(int $epoch): AuthCodeInterface
     {
         $new = clone $this;
         $new->redeemTime = $epoch;
@@ -146,7 +146,7 @@ class AuthCode implements AuthCodeInterface
         return $this->isExpiredAt(time() - $s);
     }
 
-    public function withParam(string $name, $value) : AuthCode
+    public function withParam(string $name, $value) : AuthCodeInterface
     {
         $new = clone $this;
         $new->params[$name] = $value;

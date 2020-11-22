@@ -22,7 +22,7 @@ class RefreshToken implements RefreshTokenInterface
         return $this->refreshToken;
     }
 
-    public function withRefreshToken(string $refreshToken): RefreshToken
+    public function withRefreshToken(string $refreshToken): RefreshTokenInterface
     {
         $new = clone $this;
         $new->refreshToken = $refreshToken;
@@ -34,7 +34,7 @@ class RefreshToken implements RefreshTokenInterface
         return $this->clientId;
     }
 
-    public function withClientId(string $clientId): RefreshToken
+    public function withClientId(string $clientId): RefreshTokenInterface
     {
         $new = clone $this;
         $new->clientId = $clientId;
@@ -46,7 +46,7 @@ class RefreshToken implements RefreshTokenInterface
         return $this->ownerId;
     }
 
-    public function withOwnerId(string $ownerId): RefreshToken
+    public function withOwnerId(string $ownerId): RefreshTokenInterface
     {
         $new = clone $this;
         $new->ownerId = $ownerId;
@@ -58,7 +58,7 @@ class RefreshToken implements RefreshTokenInterface
         return $this->scope;
     }
 
-    public function withScope(string $scope): RefreshToken
+    public function withScope(string $scope): RefreshTokenInterface
     {
         $new = clone $this;
         $new->scope = $scope;
