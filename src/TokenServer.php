@@ -25,6 +25,7 @@ class TokenServer
     private $httpFactory;
 
     private $createAccessTokenHandler;
+    private $createClientAccessTokenHandler;
     private $findAuthorizationCodeHandler;
     private $findClientHandler;
     private $findRefreshTokenHandler;
@@ -56,11 +57,32 @@ class TokenServer
             AccessToken::class)
         ) {
             throw new InvalidArgumentException(
-                'Handler createAccesToken signature MUST be: '.
+                'Handler createAccessToken signature MUST be: '.
                 '(ClientInterface $client, ResourceOwnerInterface $owner, string $scope) : AccessToken'
             );
         }
         $this->createAccessTokenHandler = $handler;
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param callable $handler
+     * @return void
+     */
+    public function setCreateClientAccessTokenHandler(callable $handler)
+    {
+        if (!Functions::testSignature(
+            $handler,
+            [ClientInterface::class, 'string'],
+            AccessToken::class)
+        ) {
+            throw new InvalidArgumentException(
+                'Handler createClientAccessToken signature MUST be: '.
+                '(ClientInterface $client, string $scope) : AccessToken'
+            );
+        }
+        $this->createClientAccessTokenHandler = $handler;
     }
 
     /**
@@ -166,6 +188,8 @@ class TokenServer
         switch ($params['grant_type']) {
             case TokenRequestGrantTypes::AUTHORIZATION_CODE:
                 return $this->handleCodeRequest($request);
+            case TokenRequestGrantTypes::CLIENT_CREDENTIALS:
+                return $this->handleClientCredentialsRequest($request);
             case TokenRequestGrantTypes::REFRESH_TOKEN:
                 return $this->handleRefreshTokenRequest($request);
         }
@@ -228,6 +252,22 @@ class TokenServer
         $response = $this->buildAccessTokenResponse($accessToken);
 
         return $response;
+    }
+
+    public function handleClientCredentialsRequest(RequestInterface $request) : ResponseInterface
+    {
+        if (!is_callable($this->createClientAccessTokenHandler)) {
+            throw new LogicException('Callable createClientAccessTokenHandler not found.');
+        }
+
+        $client = $this->checkClientCredentials($request);
+        $params = MessageHelper::getContent($request);
+
+        $scope = array_key_exists('scope', $params) ? $params['scope'] : '';
+        
+        $accessToken = call_user_func($this->createClientAccessTokenHandler, $client, $scope);
+
+        return $this->buildAccessTokenResponse($accessToken);
     }
 
     public function handleRefreshTokenRequest(RequestInterface $request) : ResponseInterface
