@@ -6,7 +6,7 @@ use Francerz\Http\Utils\Constants\MediaTypes;
 use Francerz\Http\Utils\Constants\StatusCodes;
 use Francerz\Http\Utils\Headers\BasicAuthorizationHeader;
 use Francerz\Http\Utils\HttpFactoryManager;
-use Francerz\Http\Utils\MessageHelper;
+use Francerz\Http\Utils\HttpHelper;
 use Francerz\OAuth2\AccessToken;
 use Francerz\OAuth2\AuthServer\AuthCodeInterface;
 use Francerz\OAuth2\AuthServer\ClientInterface;
@@ -23,6 +23,7 @@ use RuntimeException;
 class TokenServer
 {
     private $httpFactory;
+    private $httpHelper;
 
     private $createAccessTokenHandler;
     private $createClientAccessTokenHandler;
@@ -35,6 +36,7 @@ class TokenServer
     public function __construct(HttpFactoryManager $httpFactory)
     {
         $this->httpFactory = $httpFactory;
+        $this->httpHelper = new HttpHelper($httpFactory);
     }
 
     public function getHttpFactory() : HttpFactoryManager
@@ -174,7 +176,7 @@ class TokenServer
 
     public function handle(RequestInterface $request): ResponseInterface
     {
-        $params = MessageHelper::getContent($request);
+        $params = HttpHelper::getContent($request);
 
         if (empty($params)) {
             throw new RuntimeException('No parameters received.');
@@ -220,7 +222,7 @@ class TokenServer
 
         $client = $this->checkClientCredentials($request);
 
-        $params = MessageHelper::getContent($request);
+        $params = HttpHelper::getContent($request);
 
         if (!array_key_exists('code', $params)) {
             throw new RuntimeException('Missing code parameter.');
@@ -261,7 +263,7 @@ class TokenServer
         }
 
         $client = $this->checkClientCredentials($request);
-        $params = MessageHelper::getContent($request);
+        $params = HttpHelper::getContent($request);
 
         $scope = array_key_exists('scope', $params) ? $params['scope'] : '';
         
@@ -290,7 +292,7 @@ class TokenServer
         #endregion
 
         $client = $this->checkClientCredentials($request);
-        $params = MessageHelper::getContent($request);
+        $params = HttpHelper::getContent($request);
 
         if (!array_key_exists('refresh_token', $params)) {
             throw new RuntimeException('Missing refresh_token.');
@@ -320,7 +322,8 @@ class TokenServer
         ?string &$client_id = '',
         ?string &$client_secret = ''
     ) {
-        $auth = MessageHelper::getFirstAuthorizationHeader($request);
+        $auths = HttpHelper::getAuthorizationHeaders($request);
+        $auth = reset($auths);
 
         if (isset($auth) && $auth instanceof BasicAuthorizationHeader) {
             $client_id = $auth->getUser();
@@ -328,7 +331,7 @@ class TokenServer
             return;
         }
 
-        $params = MessageHelper::getContent($request);
+        $params = HttpHelper::getContent($request);
         if (array_key_exists('client_id', $params)) {
             $client_id = $params['client_id'];
         }
@@ -370,11 +373,11 @@ class TokenServer
     private function buildAccessTokenResponse(AccessToken $accessToken) : ResponseInterface
     {
         $responseFactory = $this->httpFactory->getResponseFactory();
-        $response = $responseFactory->createResponse(StatusCodes::SUCCESS_OK)
+        $response = $responseFactory
+            ->createResponse(StatusCodes::SUCCESS_OK)
             ->withHeader('Cache-Control', 'no-store')
             ->withHeader('Pragma', 'no-cache');
-        MessageHelper::setHttpFactoryManager($this->httpFactory);
-        $response = MessageHelper::withContent(
+        $response = $this->httpHelper->withContent(
             $response,
             MediaTypes::APPLICATION_JSON,
             $accessToken

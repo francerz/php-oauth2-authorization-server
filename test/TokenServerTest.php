@@ -5,7 +5,7 @@ use Francerz\Http\Utils\Constants\MediaTypes;
 use Francerz\Http\Utils\Constants\Methods;
 use Francerz\Http\Utils\Headers\BasicAuthorizationHeader;
 use Francerz\Http\Utils\HttpFactoryManager;
-use Francerz\Http\Utils\MessageHelper;
+use Francerz\Http\Utils\HttpHelper;
 use Francerz\OAuth2\AccessToken;
 use Francerz\OAuth2\AuthServer\AuthCode;
 use Francerz\OAuth2\AuthServer\AuthCodeInterface;
@@ -92,7 +92,7 @@ class TokenServerTest extends TestCase
     {
         $uriFactory = $this->httpFactory->getUriFactory();
         $requestFactory = $this->httpFactory->getRequestFactory();
-        MessageHelper::setHttpFactoryManager($this->httpFactory);
+        $http = new HttpHelper($this->httpFactory);
 
         $uri = $uriFactory->createUri('https://oauth2.server.com/token');
 
@@ -101,7 +101,7 @@ class TokenServerTest extends TestCase
             ->withHeader('Authorization', new BasicAuthorizationHeader(
                 $this->client_id, $this->client_secret
             ));
-        $request = MessageHelper::withContent(
+        $request = $http->withContent(
             $request,
             MediaTypes::APPLICATION_X_WWW_FORM_URLENCODED,
             array(
@@ -116,7 +116,7 @@ class TokenServerTest extends TestCase
     {
         $uriFactory = $this->httpFactory->getUriFactory();
         $requestFactory = $this->httpFactory->getRequestFactory();
-        MessageHelper::setHttpFactoryManager($this->httpFactory);
+        $http = new HttpHelper($this->httpFactory);
 
         $uri = $uriFactory->createUri('https://oauth2.server.com/token');
 
@@ -125,7 +125,7 @@ class TokenServerTest extends TestCase
             ->withHeader('Authorization', new BasicAuthorizationHeader(
                 $this->client_id, $this->client_secret
             ));
-        $request = MessageHelper::withContent(
+        $request = $http->withContent(
             $request,
             MediaTypes::APPLICATION_X_WWW_FORM_URLENCODED,
             array(
@@ -143,7 +143,7 @@ class TokenServerTest extends TestCase
 
         $response = $tokenServer->handle($request);
 
-        $this->assertTrue(MessageHelper::isSuccess($response));
+        $this->assertTrue(HttpHelper::isSuccess($response));
         $this->assertEquals(MediaTypes::APPLICATION_JSON, $response->getHeaderLine('Content-Type'));
         $this->assertEquals('no-store', $response->getHeaderLine('Cache-Control'));
         $this->assertEquals('no-cache', $response->getHeaderLine('Pragma'));
@@ -163,7 +163,7 @@ class TokenServerTest extends TestCase
 
         $response = $tokenServer->handle($request);
 
-        $this->assertTrue(MessageHelper::isSuccess($response));
+        $this->assertTrue(HttpHelper::isSuccess($response));
         $this->assertEquals(MediaTypes::APPLICATION_JSON, $response->getHeaderLine('Content-Type'));
         $this->assertEquals('no-store', $response->getHeaderLine('Cache-Control'));
         $this->assertEquals('no-cache', $response->getHeaderLine('Pragma'));
