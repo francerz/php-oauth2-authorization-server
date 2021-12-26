@@ -4,14 +4,15 @@ namespace Francerz\OAuth2\AuthServer;
 
 class ResourceOwner implements ResourceOwnerInterface
 {
-    private $uniqueId;
-    public function __construct(string $uniqueId)
+    private $ownerId;
+
+    public function __construct(string $ownerId)
     {
-        $this->uniqueId = $uniqueId;
+        $this->ownerId = $ownerId;
     }
 
     public function getOwnerId(): string
     {
-        return $this->uniqueId;
+        return $this->ownerId;
     }
 }

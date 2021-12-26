@@ -8,12 +8,17 @@
             "Francerz\\OAuth2\\AuthServer\\" : "src"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Francerz\\OAuth2\\AuthServer\\Dev\\" : "dev"
+        }
+    },
     "require": {
         "psr/http-message": "^1.0",
-        "francerz/oauth2-core": "^0.2"
+        "francerz/oauth2-core": "0.3"
     },
     "require-dev": {
-        "francerz/http": "^0.2.2",
+        "francerz/http": "^0.3",
         "phpunit/phpunit": "^8.5"
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Francerz\OAuth2\AuthServer;
 
-class RefreshToken implements RefreshTokenInterface
+class RefreshToken
 {
     private $refreshToken;
     private $clientId;
@@ -22,11 +22,9 @@ class RefreshToken implements RefreshTokenInterface
         return $this->refreshToken;
     }
 
-    public function withRefreshToken(string $refreshToken): RefreshTokenInterface
+    public function setRefreshToken(string $refreshToken)
     {
-        $new = clone $this;
-        $new->refreshToken = $refreshToken;
-        return $new;
+        $this->refreshToken = $refreshToken;
     }
 
     public function getClientId(): string
@@ -34,11 +32,9 @@ class RefreshToken implements RefreshTokenInterface
         return $this->clientId;
     }
 
-    public function withClientId(string $clientId): RefreshTokenInterface
+    public function setClientId(string $clientId)
     {
-        $new = clone $this;
-        $new->clientId = $clientId;
-        return $new;
+        $this->clientId = $clientId;
     }
 
     public function getOwnerId(): string
@@ -46,11 +42,9 @@ class RefreshToken implements RefreshTokenInterface
         return $this->ownerId;
     }
 
-    public function withOwnerId(string $ownerId): RefreshTokenInterface
+    public function setOwnerId(string $ownerId)
     {
-        $new = clone $this;
-        $new->ownerId = $ownerId;
-        return $new;
+        $this->ownerId = $ownerId;
     }
 
     public function getScope(): string
@@ -58,10 +52,13 @@ class RefreshToken implements RefreshTokenInterface
         return $this->scope;
     }
 
-    public function withScope(string $scope): RefreshTokenInterface
+    public function setScope(string $scope)
     {
-        $new = clone $this;
-        $new->scope = $scope;
-        return $new;
+        $this->scope = $scope;
+    }
+
+    public function __toString()
+    {
+        return $this->refreshToken;
     }
 }
