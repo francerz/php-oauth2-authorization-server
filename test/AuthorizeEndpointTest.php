@@ -87,7 +87,8 @@ class AuthorizeEndpointTest extends TestCase
     {
         $httpFactory = new HttpFactory();
         $request = $this->createRequestFromBreaker($breaker);
-        $handler = new AuthorizeGrantHandler($request, $httpFactory, $httpFactory);
+        $handler = new AuthorizeGrantHandler($httpFactory, $httpFactory);
+        $handler->initFromRequest($request);
 
         $grantor = new TestGrantor();
         $grantor->setAuthorizationCode('A1b2C3d4E5f6');
@@ -161,7 +162,8 @@ class AuthorizeEndpointTest extends TestCase
     {
         $httpFactory = new HttpFactory();
         $request = $this->createRequestFromBreaker($breaker);
-        $handler = new AuthorizeGrantHandler($request, $httpFactory, $httpFactory);
+        $handler = new AuthorizeGrantHandler($httpFactory, $httpFactory);
+        $handler->initFromRequest($request);
 
         $grantor = new TestGrantor();
         $handler->setImplicitGrantor($grantor);
@@ -184,7 +186,8 @@ class AuthorizeEndpointTest extends TestCase
         $uri = new Uri('https://oauth2.server.com/authorize');
         $request = new ServerRequest($uri);
         $httpFactory = new HttpFactory();
-        $handler = new AuthorizeGrantHandler($request, $httpFactory, $httpFactory);
+        $handler = new AuthorizeGrantHandler($httpFactory, $httpFactory);
+        $handler->initFromRequest($request);
 
         $ex = new AuthorizeAccessDeniedException();
         $response = $handler->catch($ex);

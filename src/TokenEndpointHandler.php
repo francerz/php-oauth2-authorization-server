@@ -6,6 +6,7 @@ use DateTimeImmutable;
 use Fig\Http\Message\StatusCodeInterface;
 use Francerz\Http\Utils\Headers\BasicAuthorizationHeader;
 use Francerz\Http\Utils\HttpHelper;
+use Francerz\Http\Utils\UriHelper;
 use Francerz\OAuth2\AccessToken;
 use Francerz\OAuth2\AuthServer\ClientInterface;
 use Francerz\OAuth2\AuthServer\Exceptions\TokenInvalidClientException;
@@ -21,6 +22,7 @@ use Francerz\OAuth2\AuthServer\Grantors\OwnerCredentialsGrantorInterface;
 use Francerz\OAuth2\AuthServer\Grantors\RefreshTokenGrantorInterface;
 use Francerz\OAuth2\AuthServer\Issuers\RefreshTokenIssuerInterface;
 use Francerz\OAuth2\ClientTypesEnum;
+use Francerz\OAuth2\CodeChallengeMethodsEnum;
 use Francerz\OAuth2\GrantTypesEnum;
 use Francerz\OAuth2\OAuth2Error;
 use Francerz\OAuth2\ScopeHelper;
@@ -52,15 +54,12 @@ class TokenEndpointHandler
 
     private $codeVerifier;
 
-    public function __construct(
-        ServerRequestInterface $request,
-        ResponseFactoryInterface $responseFactory
-    ) {
+    public function __construct(ResponseFactoryInterface $responseFactory)
+    {
         $this->responseFactory = $responseFactory;
-        $this->initFromRequest($request);
     }
 
-    private function initFromRequest(ServerRequestInterface $request)
+    public function initFromRequest(ServerRequestInterface $request)
     {
         $post = $request->getParsedBody();
         $this->setGrantType($post['grant_type'] ?? null);
@@ -279,6 +278,22 @@ class TokenEndpointHandler
         }
     }
 
+    private function isValidCodeChallenge(AuthorizationCode $authCode): bool
+    {
+        $codeChallenge = $authCode->getCodeChallenge();
+        $codeVerifier = $this->codeVerifier;
+        if (is_null($codeChallenge) && is_null($codeVerifier)) {
+            return true;
+        }
+        if (is_null($codeChallenge) || is_null($codeVerifier)) {
+            return false;
+        }
+        if ($authCode->getCodeChallengeMethod() === CodeChallengeMethodsEnum::SHA256) {
+            $codeVerifier = UriHelper::base64Encode(hash('sha256', $codeVerifier, true));
+        }
+        return $codeVerifier === $authCode->getCodeChallenge();
+    }
+
     private function handleCodeRequest(): ResponseInterface
     {
         $client = $this->fetchClient($this->codeGrantor);
@@ -298,6 +313,9 @@ class TokenEndpointHandler
         }
         if ($authCode->isExpired()) {
             throw new TokenInvalidGrantException('Authorization code expired.');
+        }
+        if (!$this->isValidCodeChallenge($authCode)) {
+            throw new TokenInvalidGrantException('Mismatch PKCE code_verifier with code_challenge');
         }
 
         $owner = $this->codeGrantor->findResourceOwner($authCode->getOwnerId());

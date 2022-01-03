@@ -39,7 +39,8 @@ class TokenEndpointTest extends TestCase
             ->withParsedBody([
                 'grant_type' => GrantTypesEnum::AUTHORIZATION_CODE,
                 'code' => 'zyxwvutsrqp',
-                'redirect_uri' => 'https://example.com/oauth2/callback'
+                'redirect_uri' => 'https://example.com/oauth2/callback',
+                'code_verifier' => 'a0b1c2d3e4f5g6h7i8j9'
             ]);
         return $request;
     }
@@ -47,7 +48,8 @@ class TokenEndpointTest extends TestCase
     {
         $request = $this->createAuthorizationCodeRequest();
         $httpFactory = new HttpFactory();
-        $handler = new TokenEndpointHandler($request, $httpFactory);
+        $handler = new TokenEndpointHandler($httpFactory);
+        $handler->initFromRequest($request);
         $handler->setCodeGrantor(new TestGrantor());
         $response = $handler->handle();
         $this->assertStringContainsString('access_token', (string)$response->getBody());
@@ -75,7 +77,8 @@ class TokenEndpointTest extends TestCase
     {
         $request = $this->createOwnerPasswordRequest();
         $httpFactory = new HttpFactory();
-        $handler = new TokenEndpointHandler($request, $httpFactory);
+        $handler = new TokenEndpointHandler($httpFactory);
+        $handler->initFromRequest($request);
         $handler->setOwnerGrantor(new TestGrantor());
         $response = $handler->handle();
         $this->assertStringContainsString('access_token', (string)$response->getBody());
@@ -101,7 +104,8 @@ class TokenEndpointTest extends TestCase
     {
         $request = $this->createClientCredentialsRequest();
         $httpFactory = new HttpFactory();
-        $handler = new TokenEndpointHandler($request, $httpFactory);
+        $handler = new TokenEndpointHandler($httpFactory);
+        $handler->initFromRequest($request);
         $handler->setClientGrantor(new TestGrantor());
         $response = $handler->handle();
         $this->assertStringContainsString('access_token', (string)$response->getBody());
@@ -129,7 +133,8 @@ class TokenEndpointTest extends TestCase
     {
         $request = $this->createRefreshTokenRequest();
         $httpFactory = new HttpFactory();
-        $handler = new TokenEndpointHandler($request, $httpFactory);
+        $handler = new TokenEndpointHandler($httpFactory);
+        $handler->initFromRequest($request);
         $handler->setRefreshTokenGrantor(new TestGrantor());
         $response = $handler->handle();
         $this->assertStringContainsString('access_token', (string)$response->getBody());
@@ -141,7 +146,8 @@ class TokenEndpointTest extends TestCase
         $uri = new Uri('https://oauth2.server.com/token');
         $request = new ServerRequest($uri, RequestMethodInterface::METHOD_POST);
         $httpFactory = new HttpFactory();
-        $handler = new TokenEndpointHandler($request, $httpFactory);
+        $handler = new TokenEndpointHandler($httpFactory);
+        $handler->initFromRequest($request);
 
         $this->expectException(OAuth2FlowException::class);
         $handler->handle();
@@ -152,7 +158,8 @@ class TokenEndpointTest extends TestCase
         $uri = new Uri('https://oauth2.server.com/token');
         $request = new ServerRequest($uri);
         $httpFactory = new HttpFactory();
-        $handler = new TokenEndpointHandler($request, $httpFactory);
+        $handler = new TokenEndpointHandler($httpFactory);
+        $handler->initFromRequest($request);
 
         $ex = new TokenUnsupportedGrantTypeException();
         $response = $handler->catch($ex);

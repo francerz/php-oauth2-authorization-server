@@ -30,7 +30,9 @@ class AuthorizationCode
      * @param string $clientId
      * @param string $ownerId
      * @param string|null $scope
-     * @param UriInterface|null $redirectUri
+     * @param string|null $redirectUri
+     * @param string|null $codeChallenge
+     * @param string $codeChallengeMethod
      * @param integer $lifetime
      * @param DateTimeInterface|int|null $createTime
      * @param DateTimeInterface|int|null $redeemTime
@@ -40,7 +42,7 @@ class AuthorizationCode
         string $clientId,
         string $ownerId,
         ?string $scope = null,
-        ?UriInterface $redirectUri = null,
+        ?string $redirectUri = null,
         ?string $codeChallenge = null,
         $codeChallengeMethod = null,
         int $lifetime = 600,
@@ -158,12 +160,12 @@ class AuthorizationCode
         return $this->redeemTime;
     }
 
-    public function setRedirectUri(UriInterface $uri)
+    public function setRedirectUri(?string $uri)
     {
         $this->redirectUri = $uri;
     }
 
-    public function getRedirectUri(): ?UriInterface
+    public function getRedirectUri(): ?string
     {
         return $this->redirectUri;
     }
@@ -198,7 +200,7 @@ class AuthorizationCode
         return $this->isExpiredAt($time);
     }
 
-    public function setCodeChallenge(string $codeChallenge)
+    public function setCodeChallenge(?string $codeChallenge)
     {
         $this->codeChallenge = $codeChallenge;
     }

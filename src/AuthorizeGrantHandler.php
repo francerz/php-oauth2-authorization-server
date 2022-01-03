@@ -21,6 +21,7 @@ use Francerz\OAuth2\ScopeHelper;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
 use Psr\Http\Message\UriFactoryInterface;
 use Throwable;
@@ -30,7 +31,6 @@ class AuthorizeGrantHandler
     private $codeGrantor;
     private $implicitGrantor;
 
-    private $request;
     private $responseFactory;
     private $uriFactory;
 
@@ -54,14 +54,11 @@ class AuthorizeGrantHandler
     private $codeChallengeMethod;
 
     public function __construct(
-        ServerRequestInterface $request,
         ResponseFactoryInterface $responseFactory,
         UriFactoryInterface $uriFactory
     ) {
-        $this->request = $request;
         $this->responseFactory = $responseFactory;
         $this->uriFactory = $uriFactory;
-        $this->initFromRequest($request);
     }
 
     public function setCodeGrantor(AuthorizationCodeGrantorInterface $grantor)
@@ -88,7 +85,7 @@ class AuthorizeGrantHandler
     }
 
     /**
-     * @param ResponseTypesEnum|string $responseType
+     * @param ResponseTypesEnum|string|null $responseType
      * @return void
      */
     public function setResponseType($responseType)
@@ -97,14 +94,11 @@ class AuthorizeGrantHandler
     }
 
     /**
-     * @param UriInterface|string $redirectUri
+     * @param UriInterface|string|null $redirectUri
      * @return void
      */
     public function setRedirectUri($redirectUri)
     {
-        if (is_null($redirectUri)) {
-            return;
-        }
         if (is_string($redirectUri)) {
             $redirectUri = $this->uriFactory->createUri($redirectUri);
         }
@@ -112,34 +106,36 @@ class AuthorizeGrantHandler
     }
 
     /**
-     * @param string|string[] $scope
+     * @param string|string[]|null $scope
      * @return void
      */
     public function setScope($scope)
     {
-        if (is_null($scope)) {
-            return;
-        }
         $this->scope = ScopeHelper::toString($scope);
     }
 
     /**
-     * @param string $state
+     * @param string|null $state
      * @return void
      */
     public function setState($state)
     {
-        if (is_null($state)) {
-            return;
-        }
         $this->state = $state;
     }
 
+    /**
+     * @param string|null $codeChallenge
+     * @return void
+     */
     public function setCodeChallenge(?string $codeChallenge)
     {
         $this->codeChallenge = $codeChallenge;
     }
 
+    /**
+     * @param string|null $codeChallengeMethod
+     * @return void
+     */
     public function setCodeChallengeMethod($codeChallengeMethod)
     {
         if (is_null($codeChallengeMethod)) {
@@ -169,24 +165,27 @@ class AuthorizeGrantHandler
         if (!isset($this->responseType)) {
             throw new AuthorizeInvalidRequestException("Missing 'response_type' attribute.");
         }
+        if (!$approved) {
+            throw new AuthorizeAccessDeniedException('Resource Owner explicity denied authorization.');
+        }
 
         switch ($this->responseType) {
             case ResponseTypesEnum::AUTHORIZATION_CODE:
                 if (!isset($this->codeGrantor)) {
                     throw new AuthorizeUnsupportedResponseTypeException($this->responseType);
                 }
-                return $this->handleAuthorizationCodeRequest($approved);
+                return $this->handleAuthorizationCodeRequest();
             case ResponseTypesEnum::TOKEN:
                 if (!isset($this->implicitGrantor)) {
                     throw new AuthorizeUnsupportedResponseTypeException($this->responseType);
                 }
-                return $this->handleImplicitRequest($approved);
+                return $this->handleImplicitRequest();
             default:
                 throw new AuthorizeUnsupportedResponseTypeException($this->responseType);
         }
     }
 
-    private function handleAuthorizationCodeRequest(bool $approved): ResponseInterface
+    private function handleAuthorizationCodeRequest(): ResponseInterface
     {
         $client = $this->codeGrantor->findClient($this->clientId);
         if (!isset($client)) {
@@ -216,7 +215,7 @@ class AuthorizeGrantHandler
             ->withHeader('Location', (string)$redirectUri);
     }
 
-    private function handleImplicitRequest(bool $approved): ResponseInterface
+    private function handleImplicitRequest(): ResponseInterface
     {
         $client = $this->implicitGrantor->findClient($this->clientId);
         if (!isset($client)) {

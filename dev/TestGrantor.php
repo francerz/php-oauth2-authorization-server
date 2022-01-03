@@ -2,6 +2,7 @@
 
 namespace Francerz\OAuth2\AuthServer\Dev;
 
+use Francerz\Http\Uri;
 use Francerz\OAuth2\AccessToken;
 use Francerz\OAuth2\AuthServer\AuthorizationCode;
 use Francerz\OAuth2\AuthServer\Client;
@@ -15,6 +16,7 @@ use Francerz\OAuth2\AuthServer\Issuers\RefreshTokenIssuerInterface;
 use Francerz\OAuth2\AuthServer\RefreshToken;
 use Francerz\OAuth2\AuthServer\ResourceOwner;
 use Francerz\OAuth2\AuthServer\ResourceOwnerInterface;
+use Francerz\OAuth2\CodeChallengeMethodsEnum;
 use Psr\Http\Message\UriInterface;
 
 class TestGrantor implements
@@ -105,7 +107,15 @@ class TestGrantor implements
 
     public function findAuthorizationCode(string $code): AuthorizationCode
     {
-        return new AuthorizationCode($code, $this->clientId, $this->ownerId, $this->scope);
+        return new AuthorizationCode(
+            $code,
+            $this->clientId,
+            $this->ownerId,
+            $this->scope,
+            'https://example.com/oauth2/callback',
+            'a0b1c2d3e4f5g6h7i8j9',
+            CodeChallengeMethodsEnum::SHA256
+        );
     }
 
     public function saveAuthorizationCodeRedeemTime(AuthorizationCode $authCode)
