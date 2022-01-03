@@ -14,7 +14,8 @@ use Francerz\OAuth2\AuthServer\Exceptions\AuthorizeUnauthorizedClientException;
 use Francerz\OAuth2\AuthServer\Exceptions\AuthorizeUnsupportedResponseTypeException;
 use Francerz\OAuth2\AuthServer\Grantors\AuthorizationCodeGrantorInterface;
 use Francerz\OAuth2\AuthServer\Grantors\ImplicitGrantorInterface;
-use Francerz\OAuth2\Error;
+use Francerz\OAuth2\CodeChallengeMethodsEnum;
+use Francerz\OAuth2\OAuth2Error;
 use Francerz\OAuth2\ResponseTypesEnum;
 use Francerz\OAuth2\ScopeHelper;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -47,6 +48,10 @@ class AuthorizeGrantHandler
 
     /** @var string */
     private $state;
+
+    /** @var string|null */
+    private $codeChallenge;
+    private $codeChallengeMethod;
 
     public function __construct(
         ServerRequestInterface $request,
@@ -129,9 +134,22 @@ class AuthorizeGrantHandler
         }
         $this->state = $state;
     }
+
+    public function setCodeChallenge(?string $codeChallenge)
+    {
+        $this->codeChallenge = $codeChallenge;
+    }
+
+    public function setCodeChallengeMethod($codeChallengeMethod)
+    {
+        if (is_null($codeChallengeMethod)) {
+            $codeChallengeMethod = CodeChallengeMethodsEnum::PLAIN;
+        }
+        $this->codeChallengeMethod = CodeChallengeMethodsEnum::coerce($codeChallengeMethod);
+    }
     #endregion
 
-    private function initFromRequest(ServerRequestInterface $request)
+    public function initFromRequest(ServerRequestInterface $request)
     {
         $body = $request->getParsedBody();
         $this->setClientId($body['client_id'] ?? null);
@@ -139,6 +157,8 @@ class AuthorizeGrantHandler
         $this->setRedirectUri($body['redirect_uri'] ?? null);
         $this->setScope($body['scope'] ?? null);
         $this->setState($body['state'] ?? null);
+        $this->setCodeChallengeMethod($body['code_challenge_method'] ?? null);
+        $this->setCodeChallenge($body['code_challenge'] ?? null);
     }
 
     public function handle(bool $approved): ResponseInterface
@@ -176,8 +196,14 @@ class AuthorizeGrantHandler
         if (!isset($owner)) {
             throw new AuthorizeServerErrorException("Failed retrieving resource owner profile.");
         }
-
-        $code = $this->codeGrantor->issueAuthorizationCode($client, $owner, $this->scope, $this->redirectUri);
+        $code = $this->codeGrantor->issueAuthorizationCode(
+            $client,
+            $owner,
+            $this->scope,
+            $this->redirectUri,
+            $this->codeChallenge,
+            $this->codeChallengeMethod
+        );
 
         $uriParams = ['code' => (string)$code];
         if (isset($this->state)) {
@@ -261,23 +287,23 @@ class AuthorizeGrantHandler
     private function catchExceptionError(Throwable $ex)
     {
         if ($ex instanceof AuthorizeAccessDeniedException) {
-            return new Error(AuthorizeErrorEnum::ACCESS_DENIED, $ex->getMessage());
+            return new OAuth2Error(AuthorizeErrorEnum::ACCESS_DENIED, $ex->getMessage());
         }
         if ($ex instanceof AuthorizeInvalidRequestException) {
-            return new Error(AuthorizeErrorEnum::INVALID_REQUEST, $ex->getMessage());
+            return new OAuth2Error(AuthorizeErrorEnum::INVALID_REQUEST, $ex->getMessage());
         }
         if ($ex instanceof AuthorizeInvalidScopeException) {
-            return new Error(AuthorizeErrorEnum::INVALID_SCOPE, $ex->getMessage());
+            return new OAuth2Error(AuthorizeErrorEnum::INVALID_SCOPE, $ex->getMessage());
         }
         if ($ex instanceof AuthorizeTemporarilyUnavailableException) {
-            return new Error(AuthorizeErrorEnum::TEMPORARILY_UNAVAILABLE, $ex->getMessage());
+            return new OAuth2Error(AuthorizeErrorEnum::TEMPORARILY_UNAVAILABLE, $ex->getMessage());
         }
         if ($ex instanceof AuthorizeUnauthorizedClientException) {
-            return new Error(AuthorizeErrorEnum::UNAUTHORIZED_CLIENT, $ex->getMessage());
+            return new OAuth2Error(AuthorizeErrorEnum::UNAUTHORIZED_CLIENT, $ex->getMessage());
         }
         if ($ex instanceof AuthorizeUnsupportedResponseTypeException) {
-            return new Error(AuthorizeErrorEnum::UNSUPPORTED_RESPONSE_TYPE, $ex->getMessage());
+            return new OAuth2Error(AuthorizeErrorEnum::UNSUPPORTED_RESPONSE_TYPE, $ex->getMessage());
         }
-        return new Error(AuthorizeErrorEnum::SERVER_ERROR, $ex->getMessage());
+        return new OAuth2Error(AuthorizeErrorEnum::SERVER_ERROR, $ex->getMessage());
     }
 }

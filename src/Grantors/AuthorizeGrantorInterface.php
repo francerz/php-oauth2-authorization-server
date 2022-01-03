@@ -9,5 +9,8 @@ use Francerz\OAuth2\AuthServer\ResourceOwnerInterface;
  */
 interface AuthorizeGrantorInterface
 {
+    /**
+     * @return ResourceOwnerInterface|null
+     */
     public function getCurrentResourceOwner(): ?ResourceOwnerInterface;
 }

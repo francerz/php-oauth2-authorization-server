@@ -20,8 +20,9 @@ use Francerz\OAuth2\AuthServer\Grantors\ClientCredentialsGrantorInterface;
 use Francerz\OAuth2\AuthServer\Grantors\OwnerCredentialsGrantorInterface;
 use Francerz\OAuth2\AuthServer\Grantors\RefreshTokenGrantorInterface;
 use Francerz\OAuth2\AuthServer\Issuers\RefreshTokenIssuerInterface;
-use Francerz\OAuth2\Error;
+use Francerz\OAuth2\ClientTypesEnum;
 use Francerz\OAuth2\GrantTypesEnum;
+use Francerz\OAuth2\OAuth2Error;
 use Francerz\OAuth2\ScopeHelper;
 use Francerz\OAuth2\TokenErrorEnum;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -49,6 +50,8 @@ class TokenEndpointHandler
     private $scope;
     private $refreshToken;
 
+    private $codeVerifier;
+
     public function __construct(
         ServerRequestInterface $request,
         ResponseFactoryInterface $responseFactory
@@ -68,6 +71,7 @@ class TokenEndpointHandler
         $this->setPassword($post['password'] ?? null);
         $this->setScope($post['scope'] ?? null);
         $this->setRefreshToken($post['refresh_token'] ?? null);
+        $this->setCodeVerifier($post['code_verifier'] ?? null);
 
         self::fetchClientCredentials($request, $clientId, $clientSecret);
         if (isset($clientId)) {
@@ -84,7 +88,6 @@ class TokenEndpointHandler
         $auths = HttpHelper::getAuthorizationHeaders($request);
         if (isset($auths)) {
             $auth = reset($auths);
-    
             if (isset($auth) && $auth instanceof BasicAuthorizationHeader) {
                 $clientId = $auth->getUser();
                 $clientSecret = $auth->getPassword();
@@ -151,7 +154,7 @@ class TokenEndpointHandler
             throw new TokenInvalidClientException("Cannot found client with client_id '{$this->clientId}'.");
         }
 
-        if ($client->isConfidential()) {
+        if ($client->getClientType() == ClientTypesEnum::TYPE_CONFIDENTIAL) {
             if (empty($this->clientSecret)) {
                 throw new TokenInvalidClientException("Missing required 'client_secret'.");
             }
@@ -238,6 +241,11 @@ class TokenEndpointHandler
     public function setRefreshToken(?string $refreshToken)
     {
         $this->refreshToken = $refreshToken;
+    }
+
+    public function setCodeVerifier(?string $codeVerifier)
+    {
+        $this->codeVerifier = $codeVerifier;
     }
 
     public function handle(): ResponseInterface
@@ -378,23 +386,23 @@ class TokenEndpointHandler
     private function catchExceptionError(Throwable $ex)
     {
         if ($ex instanceof TokenInvalidClientException) {
-            return new Error(TokenErrorEnum::INVALID_CLIENT, $ex->getMessage());
+            return new OAuth2Error(TokenErrorEnum::INVALID_CLIENT, $ex->getMessage());
         }
         if ($ex instanceof TokenInvalidGrantException) {
-            return new Error(TokenErrorEnum::INVALID_GRANT, $ex->getMessage());
+            return new OAuth2Error(TokenErrorEnum::INVALID_GRANT, $ex->getMessage());
         }
         if ($ex instanceof TokenInvalidRequestException) {
-            return new Error(TokenErrorEnum::INVALID_REQUEST, $ex->getMessage());
+            return new OAuth2Error(TokenErrorEnum::INVALID_REQUEST, $ex->getMessage());
         }
         if ($ex instanceof TokenInvalidScopeException) {
-            return new Error(TokenErrorEnum::INVALID_SCOPE, $ex->getMessage());
+            return new OAuth2Error(TokenErrorEnum::INVALID_SCOPE, $ex->getMessage());
         }
         if ($ex instanceof TokenUnauthorizedClientException) {
-            return new Error(TokenErrorEnum::UNAUTHORIZED_CLIENT, $ex->getMessage());
+            return new OAuth2Error(TokenErrorEnum::UNAUTHORIZED_CLIENT, $ex->getMessage());
         }
         if ($ex instanceof TokenUnsupportedGrantTypeException) {
-            return new Error(TokenErrorEnum::UNSUPPORTED_GRANT_TYPE, $ex->getMessage());
+            return new OAuth2Error(TokenErrorEnum::UNSUPPORTED_GRANT_TYPE, $ex->getMessage());
         }
-        return new Error('server_error', $ex->getMessage());
+        return new OAuth2Error('server_error', $ex->getMessage());
     }
 }

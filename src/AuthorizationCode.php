@@ -6,6 +6,7 @@ use DateInterval;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
+use Francerz\OAuth2\CodeChallengeMethodsEnum;
 use Psr\Http\Message\UriInterface;
 
 class AuthorizationCode
@@ -19,6 +20,8 @@ class AuthorizationCode
     private $expireTime;
     private $redeemTime;
     private $redirectUri;
+    private $codeChallenge;
+    private $codeChallengeMethod;
 
     private $params = array();
 
@@ -36,8 +39,10 @@ class AuthorizationCode
         string $code,
         string $clientId,
         string $ownerId,
-        ?string $scope,
+        ?string $scope = null,
         ?UriInterface $redirectUri = null,
+        ?string $codeChallenge = null,
+        $codeChallengeMethod = null,
         int $lifetime = 600,
         $createTime = null,
         $redeemTime = null
@@ -52,6 +57,9 @@ class AuthorizationCode
         $this->createTime = static::parseDateTimeImmutable($createTime, true);
         $this->expireTime = $this->createTime->add(DateInterval::createFromDateString("{$lifetime} seconds"));
         $this->redeemTime = static::parseDateTimeImmutable($redeemTime);
+
+        $this->codeChallenge = $codeChallenge;
+        $this->setCodeChallengeMethod($codeChallengeMethod);
     }
 
     private static function parseDateTimeImmutable($dateTime, $parseNull = false)
@@ -188,6 +196,28 @@ class AuthorizationCode
         $time = new DateTime();
         $time = $time->sub(DateInterval::createFromDateString("{$s} seconds"));
         return $this->isExpiredAt($time);
+    }
+
+    public function setCodeChallenge(string $codeChallenge)
+    {
+        $this->codeChallenge = $codeChallenge;
+    }
+    public function getCodeChallenge()
+    {
+        return $this->codeChallenge;
+    }
+
+    public function setCodeChallengeMethod($codeChallengeMethod)
+    {
+        if (is_null($codeChallengeMethod)) {
+            $codeChallengeMethod = CodeChallengeMethodsEnum::PLAIN;
+        }
+        $this->codeChallengeMethod = CodeChallengeMethodsEnum::coerce($codeChallengeMethod);
+    }
+
+    public function getCodeChallengeMethod()
+    {
+        return $this->codeChallengeMethod;
     }
 
     public function setParam(string $name, $value)

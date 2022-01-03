@@ -88,14 +88,18 @@ class TestGrantor implements
         ClientInterface $client,
         ResourceOwnerInterface $owner,
         string $scope,
-        UriInterface $redirectUri
+        UriInterface $redirectUri,
+        ?string $codeChallenge,
+        $codeChallengeMethod
     ): AuthorizationCode {
         return new AuthorizationCode(
             $this->authCode,
             $client->getClientId(),
             $owner->getOwnerId(),
             $scope,
-            $redirectUri
+            $redirectUri,
+            $codeChallenge,
+            $codeChallengeMethod
         );
     }
 

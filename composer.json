@@ -15,7 +15,7 @@
     },
     "require": {
         "psr/http-message": "^1.0",
-        "francerz/oauth2-core": "0.3"
+        "francerz/oauth2-core": "dev-master"
     },
     "require-dev": {
         "francerz/http": "^0.3",

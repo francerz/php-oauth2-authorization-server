@@ -28,6 +28,8 @@ class AuthorizationCodeTest extends TestCase
             'user:123',      // owner_id
             'scope1 scope2', // scope
             $uriFactory->createUri('https://client.com/oauth2/callback'),
+            null,            // code challenge (PKCE)
+            null,            // code challenge method (PKCE)
             100,             // lifetime
             0,               // create time
             null             // redeem time

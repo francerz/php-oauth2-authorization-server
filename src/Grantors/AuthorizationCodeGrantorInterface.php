@@ -12,6 +12,7 @@ use Psr\Http\Message\UriInterface;
 
 interface AuthorizationCodeGrantorInterface extends
     AuthorizeGrantorInterface,
+    TokenGrantorInterface,
     ClientFinderInterface,
     ResourceOwnerFinderInterface,
     AccessTokenIssuerInterface
@@ -20,7 +21,9 @@ interface AuthorizationCodeGrantorInterface extends
         ClientInterface $client,
         ResourceOwnerInterface $owner,
         string $scope,
-        UriInterface $redirectUri
+        UriInterface $redirectUri,
+        ?string $codeChallenge,
+        $codeChallengeMethod
     ): AuthorizationCode;
     public function findAuthorizationCode(string $code): AuthorizationCode;
     public function saveAuthorizationCodeRedeemTime(AuthorizationCode $authCode);

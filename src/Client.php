@@ -2,55 +2,66 @@
 
 namespace Francerz\OAuth2\AuthServer;
 
+use Francerz\OAuth2\ClientTypesEnum;
+
 class Client implements ClientInterface
 {
     /** @var string */
-    private $client_id;
+    private $clientId;
 
     /** @var string */
-    private $client_secret;
+    private $clientSecret;
 
     /** @var string */
-    private $confidential;
+    private $clientType;
 
     /** @var string */
-    private $redirect_uri;
+    private $redirectUri;
 
     private $params = array();
 
     public function __construct(
-        string $client_id,
-        ?string $client_secret = null,
-        bool $confidential = false
+        string $clientId,
+        ?string $clientSecret = null,
+        $clientType = ClientTypesEnum::TYPE_PUBLIC
     ) {
-        $this->client_id = $client_id;
-        $this->client_secret = $client_secret;
-        $this->confidential = $confidential;
+        $this->clientId = $clientId;
+        $this->clientSecret = $clientSecret;
+        $this->clientType = $clientType;
     }
 
     public function getClientId(): string
     {
-        return $this->client_id;
+        return $this->clientId;
     }
 
     public function getClientSecret(): ?string
     {
-        return $this->client_secret;
+        return $this->clientSecret;
+    }
+
+    public function getClientType(): string
+    {
+        return $this->clientType;
     }
 
     public function setRedirectUri(?string $redirect_uri)
     {
-        $this->redirect_uri = $redirect_uri;
+        $this->redirectUri = $redirect_uri;
     }
 
     public function getRedirectUri(): ?string
     {
-        return $this->redirect_uri;
+        return $this->redirectUri;
     }
 
+    /**
+     * @deprecated v0.3.0 Use getClientType() method instead.
+     * @return boolean
+     */
     public function isConfidential(): bool
     {
-        return $this->confidential;
+        return $this->clientType === ClientTypesEnum::TYPE_CONFIDENTIAL;
     }
 
     public function setParam(string $name, $value)

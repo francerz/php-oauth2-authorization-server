@@ -7,6 +7,7 @@ use Francerz\OAuth2\AuthServer\Issuers\AccessTokenIssuerInterface;
 use Francerz\OAuth2\AuthServer\ResourceOwnerInterface;
 
 interface OwnerCredentialsGrantorInterface extends
+    TokenGrantorInterface,
     ClientFinderInterface,
     AccessTokenIssuerInterface
 {
