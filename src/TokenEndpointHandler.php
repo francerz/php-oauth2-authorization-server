@@ -25,6 +25,7 @@ use Francerz\OAuth2\ClientTypesEnum;
 use Francerz\OAuth2\CodeChallengeMethodsEnum;
 use Francerz\OAuth2\GrantTypesEnum;
 use Francerz\OAuth2\OAuth2Error;
+use Francerz\OAuth2\PKCEHelper;
 use Francerz\OAuth2\ScopeHelper;
 use Francerz\OAuth2\TokenErrorEnum;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -288,10 +289,10 @@ class TokenEndpointHandler
         if (is_null($codeChallenge) || is_null($codeVerifier)) {
             return false;
         }
-        if ($authCode->getCodeChallengeMethod() === CodeChallengeMethodsEnum::SHA256) {
-            $codeVerifier = UriHelper::base64Encode(hash('sha256', $codeVerifier, true));
+        if ($authCode->getCodeChallengeMethod() == CodeChallengeMethodsEnum::SHA256) {
+            $codeVerifier = PKCEHelper::urlEncode($codeVerifier, CodeChallengeMethodsEnum::SHA256);
         }
-        return $codeVerifier === $authCode->getCodeChallenge();
+        return $codeVerifier === $codeChallenge;
     }
 
     private function handleCodeRequest(): ResponseInterface

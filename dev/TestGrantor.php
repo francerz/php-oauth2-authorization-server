@@ -17,6 +17,7 @@ use Francerz\OAuth2\AuthServer\RefreshToken;
 use Francerz\OAuth2\AuthServer\ResourceOwner;
 use Francerz\OAuth2\AuthServer\ResourceOwnerInterface;
 use Francerz\OAuth2\CodeChallengeMethodsEnum;
+use Francerz\OAuth2\PKCEHelper;
 use Psr\Http\Message\UriInterface;
 
 class TestGrantor implements
@@ -113,7 +114,7 @@ class TestGrantor implements
             $this->ownerId,
             $this->scope,
             'https://example.com/oauth2/callback',
-            'a0b1c2d3e4f5g6h7i8j9',
+            PKCEHelper::urlEncode('a0b1c2d3e4f5g6h7i8j9', CodeChallengeMethodsEnum::SHA256),
             CodeChallengeMethodsEnum::SHA256
         );
     }
