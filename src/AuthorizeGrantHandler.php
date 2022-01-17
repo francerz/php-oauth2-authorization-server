@@ -21,7 +21,6 @@ use Francerz\OAuth2\ScopeHelper;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
 use Psr\Http\Message\UriFactoryInterface;
 use Throwable;
@@ -71,7 +70,7 @@ class AuthorizeGrantHandler
         $this->implicitGrantor = $grantor;
     }
 
-    #region
+    #region Setters and Getters
     /**
      * @param string $clientId
      * @return void
