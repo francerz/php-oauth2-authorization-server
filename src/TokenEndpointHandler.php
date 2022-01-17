@@ -326,7 +326,7 @@ class TokenEndpointHandler
         $authCode->setRedeemTime(new DateTimeImmutable());
         $this->codeGrantor->saveAuthorizationCodeRedeemTime($authCode);
 
-        $accessToken = $this->codeGrantor->issueAccessToken($client, $owner, $authCode->getScope());
+        $accessToken = $this->codeGrantor->issueOwnerAccessToken($client, $owner, $authCode->getScope());
         if ($this->codeGrantor instanceof RefreshTokenIssuerInterface) {
             $refreshToken = static::issueRefreshToken($this->codeGrantor, $client, $owner, $authCode->getScope());
             $accessToken->setRefreshToken((string)$refreshToken);
@@ -345,7 +345,7 @@ class TokenEndpointHandler
         if (!$this->ownerGrantor->verifyResourceOwnerPassword($owner, $this->password)) {
             throw new TokenInvalidGrantException('Incorrect resource owner credentials.');
         }
-        $accessToken = $this->ownerGrantor->issueAccessToken($client, $owner, $this->scope);
+        $accessToken = $this->ownerGrantor->issueOwnerAccessToken($client, $owner, $this->scope);
         if ($this->ownerGrantor instanceof RefreshTokenIssuerInterface) {
             $refreshToken = static::issueRefreshToken($this->ownerGrantor, $client, $owner, $this->scope);
             $accessToken->setRefreshToken((string)$refreshToken);
@@ -378,7 +378,7 @@ class TokenEndpointHandler
         if (!isset($resourceOwner)) {
             throw new TokenInvalidGrantException('Internal error: Cannot find resource owner of this refresh token.');
         }
-        $accessToken = $this->refreshTokenGrantor->issueAccessToken($client, $resourceOwner, $refreshToken->getScope());
+        $accessToken = $this->refreshTokenGrantor->issueOwnerAccessToken($client, $resourceOwner, $refreshToken->getScope());
         return $this->buildAccessTokenResponse($accessToken);
     }
 

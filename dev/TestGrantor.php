@@ -123,7 +123,7 @@ class TestGrantor implements
     {
     }
 
-    public function issueAccessToken(
+    public function issueOwnerAccessToken(
         ClientInterface $client,
         ResourceOwnerInterface $owner,
         string $scope

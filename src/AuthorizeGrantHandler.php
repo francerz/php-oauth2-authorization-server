@@ -150,8 +150,11 @@ class AuthorizeGrantHandler
         $this->initFromParamsArray($body);
     }
 
-    public function initFromParamsArray(array $params)
+    public function initFromParamsArray($params)
     {
+        if (!is_array($params)) {
+            return;
+        }
         $this->setClientId($params['client_id'] ?? null);
         $this->setResponseType($params['response_type'] ?? null);
         $this->setRedirectUri($params['redirect_uri'] ?? null);
@@ -230,7 +233,7 @@ class AuthorizeGrantHandler
             throw new AuthorizeServerErrorException('Failed retrieving resource owner profile.');
         }
 
-        $accessToken = $this->implicitGrantor->issueAccessToken($client, $owner, $this->scope);
+        $accessToken = $this->implicitGrantor->issueOwnerAccessToken($client, $owner, $this->scope);
 
         $uriParams = [
             'access_token' => $accessToken->getAccessToken(),
