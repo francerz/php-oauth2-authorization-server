@@ -8,7 +8,7 @@ use Francerz\OAuth2\AuthServer\ResourceOwnerInterface;
 
 interface AccessTokenIssuerInterface
 {
-    public function issueAccessToken(
+    public function issueOwnerAccessToken(
         ClientInterface $client,
         ResourceOwnerInterface $owner,
         string $scope
