@@ -46,7 +46,8 @@ class AuthorizeRequestBreaker implements Iterator
         $this->scope = $uriParams['scope'] ?? null;
         $this->state = $uriParams['state'] ?? null;
         $this->params = array_intersect_key($uriParams, array_flip([
-            'response_type', 'client_id', 'redirect_uri', 'scope', 'state'
+            'response_type', 'client_id', 'redirect_uri', 'scope', 'state',
+            'code_challenge', 'code_challenge_method'
         ]));
     }
 

@@ -147,13 +147,18 @@ class AuthorizeGrantHandler
     public function initFromRequest(ServerRequestInterface $request)
     {
         $body = $request->getParsedBody();
-        $this->setClientId($body['client_id'] ?? null);
-        $this->setResponseType($body['response_type'] ?? null);
-        $this->setRedirectUri($body['redirect_uri'] ?? null);
-        $this->setScope($body['scope'] ?? null);
-        $this->setState($body['state'] ?? null);
-        $this->setCodeChallengeMethod($body['code_challenge_method'] ?? null);
-        $this->setCodeChallenge($body['code_challenge'] ?? null);
+        $this->initFromParamsArray($body);
+    }
+
+    public function initFromParamsArray(array $params)
+    {
+        $this->setClientId($params['client_id'] ?? null);
+        $this->setResponseType($params['response_type'] ?? null);
+        $this->setRedirectUri($params['redirect_uri'] ?? null);
+        $this->setScope($params['scope'] ?? null);
+        $this->setState($params['state'] ?? null);
+        $this->setCodeChallenge($params['code_challenge'] ?? null);
+        $this->setCodeChallengeMethod($params['code_challenge_method'] ?? null);
     }
 
     public function handle(bool $approved): ResponseInterface
