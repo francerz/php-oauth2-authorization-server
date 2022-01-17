@@ -286,7 +286,7 @@ class TokenEndpointHandler
         if (is_null($codeChallenge) && is_null($codeVerifier)) {
             return true;
         }
-        if (is_null($codeChallenge) || is_null($codeVerifier)) {
+        if (is_null($codeVerifier) && !is_null($codeChallenge)) {
             return false;
         }
         if ($authCode->getCodeChallengeMethod() == CodeChallengeMethodsEnum::SHA256) {
