@@ -10,6 +10,10 @@ use Francerz\OAuth2\AuthServer\Issuers\AccessTokenIssuerInterface;
 use Francerz\OAuth2\AuthServer\ResourceOwnerInterface;
 use Psr\Http\Message\UriInterface;
 
+/**
+ * This interface should be used in the authorization server that supports
+ * Authorization Code flow.
+ */
 interface AuthorizationCodeGrantorInterface extends
     AuthorizeGrantorInterface,
     TokenGrantorInterface,

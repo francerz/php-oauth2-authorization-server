@@ -378,7 +378,11 @@ class TokenEndpointHandler
         if (!isset($resourceOwner)) {
             throw new TokenInvalidGrantException('Internal error: Cannot find resource owner of this refresh token.');
         }
-        $accessToken = $this->refreshTokenGrantor->issueOwnerAccessToken($client, $resourceOwner, $refreshToken->getScope());
+        $accessToken = $this->refreshTokenGrantor->issueOwnerAccessToken(
+            $client,
+            $resourceOwner,
+            $refreshToken->getScope()
+        );
         return $this->buildAccessTokenResponse($accessToken);
     }
 
