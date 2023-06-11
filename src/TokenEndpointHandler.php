@@ -121,13 +121,11 @@ class TokenEndpointHandler
             return $issuer->issueRefreshToken($client, $owner, $scope);
         }
 
-        $rtScope = ScopeHelper::toArray($refreshToken->getScope());
-        $newScope = ScopeHelper::merge($rtScope, $scope);
-        if (count($rtScope) === count($newScope)) {
+        if (ScopeHelper::matchAll($refreshToken->getScope(), $scope)) {
             return $refreshToken;
         }
 
-        $refreshToken->setScope(ScopeHelper::toString($newScope));
+        $refreshToken->setScope(ScopeHelper::mergeString($refreshToken->getScope(), $scope));
         $issuer->saveRefreshToken($refreshToken);
         return $refreshToken;
     }
