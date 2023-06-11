@@ -2,12 +2,10 @@
 
 namespace Francerz\OAuth2\AuthServer;
 
-use DateInterval;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Francerz\OAuth2\CodeChallengeMethodsEnum;
-use Psr\Http\Message\UriInterface;
 
 class AuthorizationCode
 {
@@ -57,7 +55,7 @@ class AuthorizationCode
         $this->lifetime = $lifetime;
 
         $this->createTime = static::parseDateTimeImmutable($createTime, true);
-        $this->expireTime = $this->createTime->add(DateInterval::createFromDateString("{$lifetime} seconds"));
+        $this->expireTime = $this->createTime->modify("+{$lifetime} seconds");
         $this->redeemTime = static::parseDateTimeImmutable($redeemTime);
 
         $this->codeChallenge = $codeChallenge;
@@ -73,7 +71,7 @@ class AuthorizationCode
             return $parseNull ? new DateTimeImmutable() : null;
         }
         if (is_string($dateTime)) {
-            $dateTime = strtotime($dateTime);
+            return new DateTimeImmutable($dateTime);
         }
         if (is_numeric($dateTime)) {
             return new DateTimeImmutable("@{$dateTime}");
@@ -127,6 +125,7 @@ class AuthorizationCode
     public function setLifetime(int $lifetime)
     {
         $this->lifetime = $lifetime;
+        $this->expireTime = $this->createTime->modify("+{$this->lifetime} seconds");
     }
 
     public function getLifetime(): int
@@ -137,6 +136,7 @@ class AuthorizationCode
     public function setCreateTime($time)
     {
         $this->createTime = static::parseDateTimeImmutable($time);
+        $this->expireTime = $this->createTime->modify("+{$this->lifetime} seconds");
     }
 
     public function getCreateTime(): DateTimeImmutable
@@ -196,7 +196,7 @@ class AuthorizationCode
     public function isExpired(int $s = 5): bool
     {
         $time = new DateTime();
-        $time = $time->sub(DateInterval::createFromDateString("{$s} seconds"));
+        $time = $time->modify("+{$s} seconds");
         return $this->isExpiredAt($time);
     }
 

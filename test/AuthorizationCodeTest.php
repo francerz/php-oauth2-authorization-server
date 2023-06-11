@@ -2,7 +2,6 @@
 
 namespace Francerz\OAuth2\AuthServer\Tests;
 
-use DateInterval;
 use DateTimeImmutable;
 use Francerz\Http\HttpFactory;
 use Francerz\Http\Utils\HttpFactoryManager;
@@ -58,13 +57,19 @@ class AuthorizationCodeTest extends TestCase
         $createTime = $authCode->getCreateTime();
         $lifetime = $authCode->getLifetime();
 
-        $expireTime = $createTime->add(DateInterval::createFromDateString("{$lifetime} seconds"));
+        $expireTime = $createTime->modify("+{$lifetime} seconds");
 
         $this->assertEquals($expireTime, $authCode->getExpireTime());
-
-        $this->assertFalse($authCode->isExpiredAt($expireTime->sub(DateInterval::createFromDateString('1 seconds'))));
+        $this->assertFalse($authCode->isExpiredAt($expireTime->modify('-1 seconds')));
         $this->assertFalse($authCode->isExpiredAt($expireTime));
-        $this->assertTrue($authCode->isExpiredAt($expireTime->add(DateInterval::createFromDateString("1 seconds"))));
+        $this->assertTrue($authCode->isExpiredAt($expireTime->modify("+1 seconds")));
+
+        $authCode->setCreateTime(new DateTimeImmutable());
+        $authCode->setLifetime(10);
+        $this->assertFalse($authCode->isExpired());
+        $this->assertFalse($authCode->isExpired(9));
+        $this->assertTrue($authCode->isExpired(10));
+        $this->assertTrue($authCode->isExpired(3600));
     }
 
     /**
